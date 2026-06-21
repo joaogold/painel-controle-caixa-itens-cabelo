@@ -1,5 +1,6 @@
 import { loadSession, getSession, onAuthChange } from './auth.js'
 import { refreshIcons } from './ui.js'
+import { unwatch } from './realtime.js'
 
 const routes = {
   '#/login': { loader: () => import('./pages/login.js'), public: true },
@@ -40,6 +41,8 @@ async function handleRoute() {
 
   rendering = true
   try {
+    // Encerra a assinatura de tempo real da tela anterior antes de trocar.
+    unwatch()
     const mod = await route.loader()
     await mod.render()
     refreshIcons()

@@ -4,6 +4,7 @@ import { refreshIcons, loadingState, emptyState, showSuccess, showError, showInf
 import { formatBRL, formatInt, parseNumber } from '../format.js'
 import { calcularItem, somarResultados, PERCENTUAL_REPASSE_PADRAO } from '../finance.js'
 import { FORMAS_PAGAMENTO } from '../labels.js'
+import { watch } from '../realtime.js'
 
 let produtos = []
 let produtoMap = new Map()
@@ -99,6 +100,41 @@ export async function render() {
   renderItens()
   renderResumo()
   refreshIcons()
+
+  // Tempo real: atualiza o estoque disponível sem apagar o carrinho.
+  watch(['produtos', 'movimentacoes_estoque', 'vendas'], refreshStock)
+}
+
+// Atualiza os números de estoque (dropdown + avisos do carrinho) em tempo real,
+// preservando os itens já adicionados e o foco dos campos.
+async function refreshStock() {
+  const { data } = await supabase.from('produtos').select('*').eq('ativo', true).order('nome')
+  if (!data) return
+  produtos = data
+  produtoMap = new Map(produtos.map((p) => [p.id, p]))
+
+  const sel = document.getElementById('sel-produto')
+  if (sel) {
+    for (const opt of sel.options) {
+      if (!opt.value) continue
+      const p = produtoMap.get(opt.value)
+      if (p) {
+        opt.disabled = p.quantidade_estoque <= 0
+        opt.textContent = `${p.nome} — estoque ${formatInt(p.quantidade_estoque)} — ${formatBRL(p.preco_venda)}`
+      }
+    }
+  }
+
+  for (const it of items) {
+    const p = produtoMap.get(it.produto_id)
+    const semEstoque = p ? it.quantidade > p.quantidade_estoque : true
+    const warnEl = document.getElementById(`warn-${it._key}`)
+    if (warnEl) {
+      warnEl.className = `text-xs ${semEstoque ? 'text-red-500' : 'text-slate-400'}`
+      warnEl.textContent = `Estoque: ${formatInt(p?.quantidade_estoque ?? 0)}${semEstoque ? ' — insuficiente' : ''}`
+    }
+  }
+  renderResumo()
 }
 
 function escapeOpt(s) {

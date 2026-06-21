@@ -5,6 +5,7 @@ import { refreshIcons, loadingState, emptyState, showError, errMessage, escapeHt
 import { formatBRL, formatInt, toISODate } from '../format.js'
 import { intervaloDoPreset, PERIODO_OPCOES } from '../filters.js'
 import { FORMAS_PAGAMENTO } from '../labels.js'
+import { watch } from '../realtime.js'
 
 let state = {
   produtos: [],
@@ -31,6 +32,9 @@ export async function render() {
 
   renderFiltros(content)
   await reloadData()
+
+  // Tempo real: atualiza o painel quando qualquer usuário muda estoque/vendas.
+  watch(['produtos', 'movimentacoes_estoque', 'vendas', 'itens_venda', 'repasses'], reloadData)
 }
 
 function renderFiltros(content) {

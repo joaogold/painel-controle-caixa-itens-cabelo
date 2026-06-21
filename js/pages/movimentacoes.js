@@ -4,6 +4,7 @@ import { createDataTable } from '../components/dataTable.js'
 import { refreshIcons, loadingState, showSuccess, showError, errMessage, escapeHtml } from '../ui.js'
 import { formatInt, formatDateTime, parseNumber } from '../format.js'
 import { TIPOS_MOVIMENTACAO_MANUAL, labelTipoMov, sentidoTipoMov } from '../labels.js'
+import { watch } from '../realtime.js'
 
 let produtos = []
 
@@ -72,6 +73,28 @@ export async function render() {
   refreshIcons()
   wireForm(content)
   await loadHistorico()
+
+  // Tempo real: atualiza histórico e números de estoque sem mexer no formulário.
+  watch(['produtos', 'movimentacoes_estoque', 'vendas'], () => realtimeRefresh(content))
+}
+
+async function realtimeRefresh(content) {
+  await loadHistorico()
+  const { data } = await supabase.from('produtos').select('*').order('nome')
+  if (!data) return
+  produtos = data
+  const sel = content.querySelector('#produto')
+  if (!sel) return
+  for (const opt of sel.options) {
+    const p = produtos.find((x) => x.id === opt.value)
+    if (p) {
+      opt.dataset.estoque = p.quantidade_estoque
+      opt.dataset.min = p.estoque_minimo
+      opt.textContent = `${p.nome} (estoque ${formatInt(p.quantidade_estoque)})`
+    }
+  }
+  // Atualiza o aviso de "Estoque atual" do produto selecionado.
+  if (sel.value) sel.dispatchEvent(new Event('change'))
 }
 
 function wireForm(content) {

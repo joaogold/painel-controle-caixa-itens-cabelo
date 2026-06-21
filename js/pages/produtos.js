@@ -15,6 +15,7 @@ import {
 import { formatBRL, formatInt, formatPercent, parseNumber } from '../format.js'
 import { metricasProduto } from '../finance.js'
 import { CATEGORIAS_SUGERIDAS } from '../labels.js'
+import { watch } from '../realtime.js'
 
 let table = null
 
@@ -31,6 +32,9 @@ export async function render() {
   document.getElementById('novo-produto').addEventListener('click', () => openProdutoForm(null))
 
   await load(content)
+
+  // Tempo real: recarrega a lista quando o estoque muda em qualquer login.
+  watch(['produtos', 'movimentacoes_estoque'], () => load(content))
 }
 
 async function load(content) {

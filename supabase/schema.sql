@@ -214,9 +214,10 @@ begin
   end if;
 
   -- Bloqueia a linha do produto durante a transação (evita corrida).
+  -- Acervo compartilhado: qualquer usuário autenticado pode movimentar.
   select quantidade_estoque into v_anterior
   from public.produtos
-  where id = p_produto_id and user_id = v_uid
+  where id = p_produto_id
   for update;
 
   if not found then
@@ -332,10 +333,10 @@ begin
       raise exception 'Desconto não pode ser negativo.' using errcode = '22023';
     end if;
 
-    -- Bloqueia e valida o produto.
+    -- Bloqueia e valida o produto (acervo compartilhado).
     select * into v_produto
     from public.produtos
-    where id = (v_item->>'produto_id')::uuid and user_id = v_uid
+    where id = (v_item->>'produto_id')::uuid
     for update;
 
     if not found then
@@ -429,12 +430,11 @@ begin
     raise exception 'Data final menor que a data inicial.' using errcode = '22023';
   end if;
 
-  -- Vendas elegíveis: do usuário, no período, ainda não vinculadas a repasse.
+  -- Vendas elegíveis (acervo compartilhado): no período, ainda não vinculadas.
   create temporary table _vendas_eleg on commit drop as
   select v.id, v.lucro_bruto, v.valor_repasse
   from public.vendas v
-  where v.user_id = v_uid
-    and v.data_venda::date between p_data_inicial and p_data_final
+  where v.data_venda::date between p_data_inicial and p_data_final
     and not exists (select 1 from public.vendas_repasses vr where vr.venda_id = v.id);
 
   select count(*), coalesce(sum(lucro_bruto),0), coalesce(sum(valor_repasse),0)
@@ -482,7 +482,7 @@ begin
   update public.repasses
   set status = 'pago',
       data_pagamento = coalesce(p_data_pagamento, now())
-  where id = p_repasse_id and user_id = v_uid
+  where id = p_repasse_id
   returning * into v_repasse;
 
   if not found then

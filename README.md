@@ -109,7 +109,10 @@ powershell -ExecutionPolicy Bypass -File .\servir.ps1
    - **anon public** → `SUPABASE_ANON_KEY`
 3. No **SQL Editor**, execute na ordem:
    1. [`supabase/schema.sql`](supabase/schema.sql) — tabelas, índices, constraints e funções.
-   2. [`supabase/rls.sql`](supabase/rls.sql) — políticas de RLS e o bucket de Storage.
+   2. [`supabase/rls.sql`](supabase/rls.sql) — políticas de RLS, bucket de Storage e Realtime.
+   - _Já tinha instalado a versão antiga (dados por usuário)? Rode também_
+     [`supabase/migracao_compartilhado_realtime.sql`](supabase/migracao_compartilhado_realtime.sql)
+     _para passar ao acervo compartilhado + tempo real._
 4. Crie o usuário admin em **Authentication → Users → Add user**.
    - (Opcional) Em **Authentication → Providers → Email**, desative “Confirm email” para
      login imediato.
@@ -168,7 +171,11 @@ Repasse R$ 4,00 · Lucro líquido R$ 36,00.
 ## 🔒 Segurança
 
 - **RLS ativado** em todas as tabelas; usuários anônimos não têm acesso.
-- Cada usuário só lê/escreve os próprios registros (`user_id = auth.uid()`).
+- **Acervo compartilhado:** todos os usuários autenticados veem e operam o mesmo
+  estoque/vendas/repasses (loja com vários operadores). O campo `user_id` registra
+  quem fez cada operação. _(Para isolar por usuário, use as políticas originais por `user_id`.)_
+- **Tempo real (Supabase Realtime):** mudanças de estoque/vendas aparecem ao vivo para
+  todos os usuários conectados, sem precisar recarregar a página.
 - Vendas e movimentações **não podem ser excluídas/editadas** pela interface (histórico preservado).
 - Venda + baixa de estoque e geração de repasse usam **funções transacionais** no banco
   (`registrar_venda`, `registrar_movimentacao`, `gerar_repasse`): ou tudo é gravado, ou nada.
