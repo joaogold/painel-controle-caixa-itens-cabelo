@@ -122,13 +122,13 @@ async function toggleAtivo(p, content) {
 async function excluir(p, content) {
   const ok = await confirmDialog({
     title: 'Excluir produto',
-    message: `Excluir “${p.nome}”? Produtos com vendas não podem ser excluídos — nesse caso, inative-o.`,
+    message: `Excluir “${p.nome}” definitivamente? Esta ação não pode ser desfeita. As vendas já registradas continuam no histórico (apenas sem o vínculo com este produto).`,
     confirmLabel: 'Excluir',
   })
   if (!ok) return
   const { error } = await supabase.from('produtos').delete().eq('id', p.id)
   if (error) {
-    showError('Não foi possível excluir (o produto possui vendas/movimentações). Inative-o.')
+    showError(errMessage(error, 'Não foi possível excluir o produto.'))
   } else {
     showSuccess('Produto excluído.')
     await load(content)

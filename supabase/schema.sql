@@ -87,7 +87,8 @@ create index if not exists idx_vendas_pagamento     on public.vendas(forma_pagam
 create table if not exists public.itens_venda (
   id                uuid primary key default gen_random_uuid(),
   venda_id          uuid not null references public.vendas(id) on delete cascade,
-  produto_id        uuid not null references public.produtos(id) on delete restrict,
+  -- on delete set null: permite excluir o produto preservando a venda no histórico.
+  produto_id        uuid references public.produtos(id) on delete set null,
   quantidade        integer not null check (quantidade > 0),
   custo_unitario    numeric(12,2) not null default 0 check (custo_unitario >= 0),
   preco_unitario    numeric(12,2) not null default 0 check (preco_unitario >= 0),
