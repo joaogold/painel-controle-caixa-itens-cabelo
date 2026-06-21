@@ -1,0 +1,27 @@
+# Blueprint de deploy no Render (Static Site)
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Você também pode configurar tudo manualmente pelo painel do Render
+# usando os valores em comentário abaixo.
+services:
+  - type: web
+    name: painel-controle-caixa-itens-cabelo
+    runtime: static
+    # Comando de build: gera a versão de produção em ./dist
+    buildCommand: npm install && npm run build
+    # Diretório de publicação
+    staticPublishPath: ./dist
+    # Reescrita para Single Page Application (React Router)
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+    envVars:
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
