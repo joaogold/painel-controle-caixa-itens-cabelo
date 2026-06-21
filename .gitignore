@@ -1,27 +1,15 @@
+# Configuração local com as chaves do Supabase (NUNCA versionar)
+config.js
+.env
+.env.*
+
+# Dependências (não são necessárias neste projeto sem build)
+node_modules
+dist
+
 # Logs
-logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Dependencies
-node_modules
-.pnp
-.pnp.js
-
-# Build output
-dist
-dist-ssr
-*.local
-
-# Environment variables (NUNCA versionar chaves)
-.env
-.env.local
-.env.development
-.env.production
-.env.*.local
 
 # Editor / OS
 .vscode/*
@@ -29,8 +17,3 @@ dist-ssr
 .idea
 .DS_Store
 Thumbs.db
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?

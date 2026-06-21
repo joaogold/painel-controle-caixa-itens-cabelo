@@ -1,27 +1,24 @@
-# Blueprint de deploy no Render (Static Site)
-# Docs: https://render.com/docs/blueprint-spec
+# Blueprint de deploy no Render (Static Site, sem build de framework).
+# O "buildCommand" gera o arquivo config.js a partir das variáveis de
+# ambiente, mantendo as chaves fora do repositório.
 #
-# Você também pode configurar tudo manualmente pelo painel do Render
-# usando os valores em comentário abaixo.
+# Em Environment, defina:
+#   SUPABASE_URL        -> URL do projeto Supabase
+#   SUPABASE_ANON_KEY   -> chave "anon public" (segura para o navegador)
 services:
   - type: web
     name: painel-controle-caixa-itens-cabelo
     runtime: static
-    # Comando de build: gera a versão de produção em ./dist
-    buildCommand: npm install && npm run build
-    # Diretório de publicação
-    staticPublishPath: ./dist
-    # Reescrita para Single Page Application (React Router)
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    buildCommand: >
+      printf "window.APP_CONFIG={SUPABASE_URL:'%s',SUPABASE_ANON_KEY:'%s'};"
+      "$SUPABASE_URL" "$SUPABASE_ANON_KEY" > config.js
+    staticPublishPath: .
     headers:
       - path: /*
         name: X-Frame-Options
         value: SAMEORIGIN
     envVars:
-      - key: VITE_SUPABASE_URL
+      - key: SUPABASE_URL
         sync: false
-      - key: VITE_SUPABASE_ANON_KEY
+      - key: SUPABASE_ANON_KEY
         sync: false

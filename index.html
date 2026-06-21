@@ -2,19 +2,62 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#db2777" />
+    <title>Painel — Controle de Caixa e Estoque</title>
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#fdf2f8', 100: '#fce7f3', 200: '#fbcfe8', 300: '#f9a8d4',
+                400: '#f472b6', 500: '#ec4899', 600: '#db2777', 700: '#be185d',
+                800: '#9d174d', 900: '#831843',
+              },
+            },
+            fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          },
+        },
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>Painel — Controle de Caixa e Estoque</title>
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <!-- Ícones (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- Configuração do Supabase (copie config.example.js para config.js) -->
+    <script src="config.js" onerror="window.__configMissing = true"></script>
+
+    <!-- Mapa de imports para os módulos ES via CDN -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.45.4",
+          "chart.js": "https://esm.sh/chart.js@4.4.3/auto",
+          "xlsx": "https://esm.sh/xlsx@0.18.5",
+          "jspdf": "https://esm.sh/jspdf@2.5.2",
+          "jspdf-autotable": "https://esm.sh/jspdf-autotable@3.8.4"
+        }
+      }
+    </script>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="h-full bg-slate-100 font-sans text-slate-800 antialiased">
+    <div id="app" class="h-full"></div>
+    <div id="toast-root" class="pointer-events-none fixed inset-x-0 top-4 z-[100] flex flex-col items-center gap-2 px-4"></div>
+    <div id="modal-root"></div>
+
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>
