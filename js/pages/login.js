@@ -20,7 +20,7 @@ export async function render() {
             !isConfigured
               ? `<div class="mb-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                   <i data-lucide="alert-triangle" class="mt-0.5 h-4 w-4 shrink-0"></i>
-                  <span>Supabase não configurado. Copie <code>config.example.js</code> para <code>config.js</code> e preencha a URL e a anon key.</span>
+                  <span>Supabase não configurado. Confira a <code>SUPABASE_URL</code> — ela deve ser o endereço completo <code>https://SEU-PROJETO.supabase.co</code> (não só o ID do projeto) — e a anon key.</span>
                 </div>`
               : ''
           }
