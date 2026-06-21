@@ -48,7 +48,7 @@ export async function render() {
 
   content.innerHTML = `
     <div class="card mb-5 p-4">
-      <div class="flex flex-wrap items-end gap-3">
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
         <div>
           <label class="label">Relatório</label>
           <select id="r-report" class="input min-w-[15rem]">

@@ -120,9 +120,9 @@ function statCard(label, value, icon, tone) {
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
           <p class="truncate text-xs font-medium uppercase tracking-wide text-slate-500">${label}</p>
-          <p class="mt-1 truncate text-2xl font-bold ${valColor}">${value}</p>
+          <p class="mt-1 truncate text-xl font-bold sm:text-2xl ${valColor}">${value}</p>
         </div>
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${iconColor}"><i data-lucide="${icon}" class="h-5 w-5"></i></div>
+        <div class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg sm:flex ${iconColor}"><i data-lucide="${icon}" class="h-5 w-5"></i></div>
       </div>
     </div>`
 }

@@ -37,7 +37,7 @@ function renderFiltros(content) {
   const filtros = content.querySelector('#filtros')
   const categorias = Array.from(new Set(state.produtos.map((p) => p.categoria))).sort()
   filtros.innerHTML = `
-    <div class="flex flex-wrap items-end gap-3">
+    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
       <div>
         <label class="label">Período</label>
         <select id="f-preset" class="input min-w-[10rem]">
@@ -174,10 +174,10 @@ function statCard(label, value, icon, tone = 'default', hint = '') {
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
           <p class="truncate text-xs font-medium uppercase tracking-wide text-slate-500">${label}</p>
-          <p class="mt-1 truncate text-2xl font-bold ${valColor}">${value}</p>
+          <p class="mt-1 truncate text-xl font-bold sm:text-2xl ${valColor}">${value}</p>
           ${hint ? `<p class="mt-1 truncate text-xs text-slate-400">${hint}</p>` : ''}
         </div>
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${iconColor}"><i data-lucide="${icon}" class="h-5 w-5"></i></div>
+        <div class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg sm:flex ${iconColor}"><i data-lucide="${icon}" class="h-5 w-5"></i></div>
       </div>
     </div>`
 }
@@ -188,7 +188,7 @@ function renderPainel() {
   const d = compute()
 
   painel.innerHTML = `
-    <div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="mb-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
       ${statCard('Unidades em estoque', formatInt(d.totalUnidades), 'boxes', 'brand')}
       ${statCard('Produtos cadastrados', formatInt(state.produtos.length), 'package')}
       ${statCard('Investido no estoque', formatBRL(d.investido), 'wallet', 'warning')}
