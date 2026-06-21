@@ -126,14 +126,14 @@ async function excluir(p, content) {
     confirmLabel: 'Excluir',
   })
   if (!ok) return
-  // .select() devolve as linhas excluídas: se vier vazio, o RLS bloqueou (0 linhas).
-  const { data, error } = await supabase.from('produtos').delete().eq('id', p.id).select()
+  // A função do banco executa toda a exclusão em uma transação e retorna
+  // explicitamente true/false; não depende do DELETE silencioso sob RLS.
+  const { data, error } = await supabase.rpc('excluir_produto', { p_produto_id: p.id })
   if (error) {
     showError(errMessage(error, 'Não foi possível excluir o produto.'))
-  } else if (!data || data.length === 0) {
+  } else if (data !== true) {
     showError(
-      'Exclusão bloqueada pelas permissões do banco. Rode o script ' +
-        'supabase/permitir_excluir_produtos.sql no SQL Editor do Supabase.',
+      'O produto não foi encontrado ou já havia sido excluído. Atualize a página e tente novamente.',
     )
   } else {
     showSuccess('Produto excluído.')

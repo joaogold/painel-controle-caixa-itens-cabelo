@@ -104,6 +104,9 @@ create table if not exists public.itens_venda (
 create index if not exists idx_itens_venda_venda    on public.itens_venda(venda_id);
 create index if not exists idx_itens_venda_produto  on public.itens_venda(produto_id);
 
+-- A função excluir_produto é criada ao fim do arquivo, depois de todas as
+-- tabelas relacionadas existirem.
+
 -- =============================================================================
 -- TABELA: movimentacoes_estoque
 -- =============================================================================
@@ -494,11 +497,39 @@ begin
 end;
 $$;
 
+-- -----------------------------------------------------------------------------
+-- excluir_produto: qualquer usuário autenticado pode excluir um produto.
+-- Preserva os valores das vendas antigas e remove o histórico de estoque dele.
+-- -----------------------------------------------------------------------------
+create or replace function public.excluir_produto(p_produto_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_excluidos integer;
+begin
+  if auth.uid() is null then
+    raise exception 'Usuário não autenticado.' using errcode = '28000';
+  end if;
+
+  update public.itens_venda set produto_id = null where produto_id = p_produto_id;
+  delete from public.movimentacoes_estoque where produto_id = p_produto_id;
+  delete from public.produtos where id = p_produto_id;
+
+  get diagnostics v_excluidos = row_count;
+  return v_excluidos > 0;
+end;
+$$;
+
 -- Permissões de execução das funções para usuários autenticados.
+revoke all on function public.excluir_produto(uuid) from public;
 grant execute on function public.registrar_movimentacao(uuid, text, integer, text, text) to authenticated;
 grant execute on function public.registrar_venda(timestamptz, text, text, text, numeric, jsonb) to authenticated;
 grant execute on function public.gerar_repasse(date, date, numeric, text) to authenticated;
 grant execute on function public.marcar_repasse_pago(uuid, timestamptz) to authenticated;
+grant execute on function public.excluir_produto(uuid) to authenticated;
 
 -- =============================================================================
 --  FIM DO SCHEMA — agora execute o arquivo rls.sql

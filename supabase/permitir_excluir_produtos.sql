@@ -32,6 +32,41 @@ drop policy if exists "produtos_delete" on public.produtos;
 create policy "produtos_delete" on public.produtos
   for delete to authenticated using (true);
 
+-- Função única usada pelo site. Ela evita a "falha silenciosa" do DELETE
+-- direto sob RLS e preserva os itens das vendas antigas.
+create or replace function public.excluir_produto(p_produto_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_excluidos integer;
+begin
+  if auth.uid() is null then
+    raise exception 'Usuário não autenticado';
+  end if;
+
+  update public.itens_venda
+     set produto_id = null
+   where produto_id = p_produto_id;
+
+  -- Redundante com ON DELETE CASCADE, mas deixa a migração compatível com
+  -- bancos antigos em que a constraint possa ter outro nome/configuração.
+  delete from public.movimentacoes_estoque
+   where produto_id = p_produto_id;
+
+  delete from public.produtos
+   where id = p_produto_id;
+
+  get diagnostics v_excluidos = row_count;
+  return v_excluidos > 0;
+end;
+$$;
+
+revoke all on function public.excluir_produto(uuid) from public;
+grant execute on function public.excluir_produto(uuid) to authenticated;
+
 -- =============================================================================
 --  FIM
 -- =============================================================================
