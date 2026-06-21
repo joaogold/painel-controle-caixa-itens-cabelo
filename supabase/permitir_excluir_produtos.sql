@@ -23,6 +23,15 @@ alter table public.itens_venda
   add constraint itens_venda_produto_id_fkey
   foreign key (produto_id) references public.produtos(id) on delete set null;
 
+-- -----------------------------------------------------------------------------
+-- Garante a PERMISSÃO de exclusão no RLS.
+-- Sem isto, o banco recusa o DELETE e devolve 0 linhas SEM erro (falha calada):
+-- o produto "some" da requisição mas continua na tabela.
+-- -----------------------------------------------------------------------------
+drop policy if exists "produtos_delete" on public.produtos;
+create policy "produtos_delete" on public.produtos
+  for delete to authenticated using (true);
+
 -- =============================================================================
 --  FIM
 -- =============================================================================
