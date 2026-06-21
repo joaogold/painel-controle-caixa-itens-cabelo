@@ -7,6 +7,9 @@ config.js
 node_modules
 dist
 
+# Ferramentas locais de desenvolvimento (servidor de teste do Claude)
+.claude/
+
 # Logs
 *.log
 npm-debug.log*
