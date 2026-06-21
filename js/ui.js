@@ -143,8 +143,10 @@ export function confirmDialog({ title, message, confirmLabel = 'Confirmar', canc
     const done = (val) => {
       if (settled) return
       settled = true
-      modal.close()
+      // Resolve primeiro: fechar o modal dispara onClose(false).
+      // Se o fechamento vier antes, confirmar vira cancelamento.
       resolve(val)
+      modal.close()
     }
     footer.querySelector('[data-cancel]').addEventListener('click', () => done(false))
     footer.querySelector('[data-ok]').addEventListener('click', () => done(true))
